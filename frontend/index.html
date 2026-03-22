@@ -1,0 +1,714 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Disease Detection</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        /* body {
+            height: 100vh;
+            background-color: #28a745;*/
+            /* background: url("/frontend/FARM.jpg")  no-repeat center center/cover; */
+          /*background: url("FARM.jpg") no-repeat center center/cover;
+            /* background: url('FARM.jpg') no-repeat center center/cover; */
+            /* display: flex;
+            justify-content: center;
+            align-items: center;
+        } */
+/* 
+        body {
+    height: 100vh;
+    background: url("/frontend/FARM.jpg") no-repeat center center/cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+} */
+body {
+    height: 100vh;
+    background: url("https://images.unsplash.com/photo-1563514227147-6d2ff665a6a0?q=80&w=871&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D") no-repeat center center/cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+        .container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            width: 320px;
+            color: black;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        input {
+            margin: 15px 0;
+            color: white;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #28a745;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+
+        #result {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Plant Check</h1>
+
+        <input type="file" id="fileInput"><br>
+
+        <button onclick="predict()">Predict</button>
+
+        <p id="result"></p>
+    </div>
+
+    <script>
+        async function predict() {
+            let file = document.getElementById("fileInput").files[0];
+
+            if (!file) {
+                alert("Please select a file!");
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append("file", file);
+
+            let response = await fetch("http://127.0.0.1:8000/predict", {
+                method: "POST",
+                body: formData
+            });
+
+            let data = await response.json();
+
+            document.getElementById("result").innerText = data.prediction;
+        }
+    </script>
+
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Disease Detection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --green-deep: #0d3320;
+            --green-mid: #1a5c38;
+            --green-bright: #2ecc71;
+            --green-neon: #39ff85;
+            --cream: #f5f0e8;
+            --glass: rgba(10, 40, 20, 0.55);
+            --glass-border: rgba(46, 204, 113, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: url("https://images.unsplash.com/photo-1563514227147-6d2ff665a6a0?q=80&w=1920&auto=format&fit=crop") no-repeat center center/cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'DM Sans', sans-serif;
+            overflow: hidden;
+        }
+
+        /* Dark overlay with animated gradient */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(
+                135deg,
+                rgba(5, 25, 12, 0.75) 0%,
+                rgba(10, 50, 25, 0.6) 50%,
+                rgba(5, 25, 12, 0.8) 100%
+            );
+            z-index: 0;
+        }
+
+        /* Animated floating particles */
+        .particles {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--green-neon);
+            border-radius: 50%;
+            opacity: 0;
+            animation: floatUp linear infinite;
+            box-shadow: 0 0 6px var(--green-neon);
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+        }
+
+        /* Main card */
+        .card {
+            position: relative;
+            z-index: 10;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 48px 44px;
+            width: 420px;
+            box-shadow:
+                0 0 0 1px rgba(46,204,113,0.08),
+                0 32px 80px rgba(0,0,0,0.5),
+                inset 0 1px 0 rgba(255,255,255,0.07);
+            animation: cardEntrance 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        @keyframes cardEntrance {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Glowing top border accent */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 20%; right: 20%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--green-neon), transparent);
+            border-radius: 2px;
+            animation: glowPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; box-shadow: 0 0 20px var(--green-neon); }
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 36px;
+            animation: fadeDown 0.7s 0.3s both;
+        }
+
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 12px;
+            animation: leafSway 4s ease-in-out infinite;
+            filter: drop-shadow(0 0 12px rgba(57,255,133,0.4));
+        }
+
+        @keyframes leafSway {
+            0%, 100% { transform: rotate(-5deg) scale(1); }
+            50% { transform: rotate(5deg) scale(1.05); }
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--cream);
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+
+        h1 span {
+            color: var(--green-bright);
+        }
+
+        .subtitle {
+            font-size: 12px;
+            color: rgba(245,240,232,0.45);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-top: 8px;
+            font-weight: 300;
+        }
+
+        /* Upload zone */
+        .upload-zone {
+            border: 1.5px dashed rgba(46,204,113,0.35);
+            border-radius: 16px;
+            padding: 28px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeUp 0.7s 0.5s both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .upload-zone::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(46,204,113,0.05) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .upload-zone:hover::before,
+        .upload-zone.dragover::before {
+            opacity: 1;
+        }
+
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            border-color: var(--green-bright);
+            background: rgba(46,204,113,0.07);
+            transform: scale(1.01);
+        }
+
+        .upload-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+            display: block;
+            transition: transform 0.3s;
+        }
+
+        .upload-zone:hover .upload-icon {
+            transform: translateY(-4px) scale(1.1);
+        }
+
+        .upload-text {
+            color: rgba(245,240,232,0.6);
+            font-size: 13px;
+            font-weight: 300;
+        }
+
+        .upload-text strong {
+            color: var(--green-bright);
+            font-weight: 500;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        /* Preview */
+        #preview {
+            display: none;
+            width: 100%;
+            max-height: 140px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-top: 12px;
+            border: 1px solid var(--glass-border);
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        #fileName {
+            font-size: 11px;
+            color: var(--green-bright);
+            margin-top: 8px;
+            display: none;
+        }
+
+        /* Button */
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #1a8a45, #2ecc71);
+            color: white;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            animation: fadeUp 0.7s 0.65s both;
+            box-shadow: 0 4px 20px rgba(46,204,113,0.25);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(46,204,113,0.4);
+            background: linear-gradient(135deg, #1e9e50, #39ff85);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Loader */
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 16px 0;
+        }
+
+        .loader-dots {
+            display: inline-flex;
+            gap: 6px;
+        }
+
+        .loader-dots span {
+            width: 8px; height: 8px;
+            background: var(--green-bright);
+            border-radius: 50%;
+            animation: bounce 1.2s ease-in-out infinite;
+        }
+
+        .loader-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loader-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .loader-text {
+            font-size: 12px;
+            color: rgba(245,240,232,0.4);
+            margin-top: 8px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Result card */
+        #resultBox {
+            display: none;
+            margin-top: 20px;
+            border-radius: 14px;
+            padding: 20px;
+            border: 1px solid var(--glass-border);
+            background: rgba(10,40,20,0.5);
+            animation: resultEntrance 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        @keyframes resultEntrance {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .result-label {
+            font-size: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(245,240,232,0.35);
+            margin-bottom: 8px;
+        }
+
+        .result-disease {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--cream);
+            margin-bottom: 12px;
+        }
+
+        .result-disease.healthy { color: var(--green-neon); }
+        .result-disease.disease { color: #ff6b6b; }
+
+        /* Confidence bar */
+        .confidence-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: rgba(245,240,232,0.4);
+            margin-bottom: 6px;
+        }
+
+        .confidence-track {
+            height: 6px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #1a8a45, var(--green-neon));
+            width: 0%;
+            transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 0 10px rgba(57,255,133,0.4);
+        }
+
+        .confidence-fill.low { background: linear-gradient(90deg, #c0392b, #ff6b6b); }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--glass-border), transparent);
+            margin: 24px 0;
+            animation: fadeUp 0.7s 0.6s both;
+        }
+
+        /* Footer tag */
+        .tag {
+            text-align: center;
+            font-size: 10px;
+            color: rgba(245,240,232,0.2);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 24px;
+            animation: fadeUp 0.7s 0.8s both;
+        }
+
+        .tag span {
+            color: var(--green-bright);
+            opacity: 0.5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Floating particles -->
+    <div class="particles" id="particles"></div>
+
+    <div class="card">
+
+        <div class="header">
+            <span class="logo">🌿</span>
+            <h1>Plant <span>Disease</span><br>Detection</h1>
+            <p class="subtitle">AI-Powered Analysis</p>
+        </div>
+
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+            <span class="upload-icon">📷</span>
+            <p class="upload-text"><strong>Click to upload</strong> or drag & drop</p>
+            <p class="upload-text" style="margin-top:4px; font-size:11px;">JPG, PNG supported</p>
+            <img id="preview" alt="preview">
+            <p id="fileName"></p>
+        </div>
+
+        <input type="file" id="fileInput" accept="image/*">
+
+        <button class="btn" onclick="predict()" id="predictBtn">
+            ANALYSE PLANT
+        </button>
+
+        <div class="loader" id="loader">
+            <div class="loader-dots">
+                <span></span><span></span><span></span>
+            </div>
+            <p class="loader-text">Analysing leaf...</p>
+        </div>
+
+        <div id="resultBox">
+            <p class="result-label">Diagnosis Result</p>
+            <p class="result-disease" id="resultDisease">—</p>
+            <div class="confidence-label">
+                <span>Confidence</span>
+                <span id="confidenceVal">0%</span>
+            </div>
+            <div class="confidence-track">
+                <div class="confidence-fill" id="confidenceFill"></div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+        <p class="tag">Powered by <span>TensorFlow</span> · CNN Model</p>
+
+    </div>
+
+    <script>
+        // Generate particles
+        const container = document.getElementById('particles');
+        for (let i = 0; i < 25; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.width = p.style.height = (Math.random() * 4 + 2) + 'px';
+            p.style.animationDuration = (Math.random() * 15 + 10) + 's';
+            p.style.animationDelay = (Math.random() * 10) + 's';
+            container.appendChild(p);
+        }
+
+        // Drag & drop
+        const zone = document.getElementById('uploadZone');
+        zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+        zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+        zone.addEventListener('drop', e => {
+            e.preventDefault();
+            zone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) handleFile(file);
+        });
+
+        // File input
+        document.getElementById('fileInput').addEventListener('change', e => {
+            const file = e.target.files[0];
+            if (file) handleFile(file);
+        });
+
+        function handleFile(file) {
+            const preview = document.getElementById('preview');
+            const fileName = document.getElementById('fileName');
+            const reader = new FileReader();
+            reader.onload = ev => {
+                preview.src = ev.target.result;
+                preview.style.display = 'block';
+                fileName.textContent = '📎 ' + file.name;
+                fileName.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function predict() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                zone.style.borderColor = '#ff6b6b';
+                zone.style.animation = 'none';
+                setTimeout(() => { zone.style.borderColor = ''; zone.style.animation = ''; }, 600);
+                return;
+            }
+
+            const btn = document.getElementById('predictBtn');
+            const loader = document.getElementById('loader');
+            const resultBox = document.getElementById('resultBox');
+
+            btn.style.display = 'none';
+            loader.style.display = 'block';
+            resultBox.style.display = 'none';
+
+            try {
+                let formData = new FormData();
+                formData.append("file", file);
+
+                let response = await fetch("http://127.0.0.1:8000/predict", {
+                    method: "POST",
+                    body: formData
+                });
+
+                let data = await response.json();
+
+                const disease = data.predicted_class;
+                const confidence = Math.round(data.confidence * 100);
+
+                const diseaseEl = document.getElementById('resultDisease');
+                // 🔥 Handle unknown/random image
+if (disease === 'Unknown') {
+    diseaseEl.textContent = '⚠️ Not a Potato Leaf';
+    diseaseEl.className = 'result-disease disease';
+    document.getElementById('confidenceVal').textContent = confidence + '%';
+    loader.style.display = 'none';
+    resultBox.style.display = 'block';
+    setTimeout(() => {
+        const fill = document.getElementById('confidenceFill');
+        fill.style.width = confidence + '%';
+        fill.classList.add('low');
+    }, 100);
+    btn.style.display = 'block';
+    return;
+}
+                diseaseEl.textContent = disease;
+                diseaseEl.className = 'result-disease ' + (disease === 'Healthy' ? 'healthy' : 'disease');
+
+                document.getElementById('confidenceVal').textContent = confidence + '%';
+
+                loader.style.display = 'none';
+                resultBox.style.display = 'block';
+
+                setTimeout(() => {
+                    const fill = document.getElementById('confidenceFill');
+                    fill.style.width = confidence + '%';
+                    if (confidence < 60) fill.classList.add('low');
+                }, 100);
+
+            } catch (err) {
+                loader.style.display = 'none';
+                const diseaseEl = document.getElementById('resultDisease');
+                diseaseEl.textContent = 'Connection error';
+                diseaseEl.className = 'result-disease disease';
+                resultBox.style.display = 'block';
+            }
+
+            btn.style.display = 'block';
+        }
+    </script>
+
+</body>
+</html>
