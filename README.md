@@ -6,7 +6,7 @@ served via a REST API and a modern animated frontend.
 ![Python](https://img.shields.io/badge/Python-3.12-blue)
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green)
-![License](https://img.shields.io/badge/License-MIT-yellow)
+
 
 ---
 
