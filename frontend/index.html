@@ -658,10 +658,17 @@ body {
                 let formData = new FormData();
                 formData.append("file", file);
 
-                let response = await fetch("http://127.0.0.1:8000/predict", {
-                    method: "POST",
-                    body: formData
+                // let response = await fetch("http://127.0.0.1:8000/predict", {
+                //     method: "POST",
+                //     body: formData
+                // });
+                let response = await fetch("/predict", {
+                method: "POST",
+                body: formData
                 });
+                if (!response.ok) {
+    throw new Error("Prediction request failed: " + response.status);
+}
 
                 let data = await response.json();
 
