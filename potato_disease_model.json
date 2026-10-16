@@ -1,0 +1,21 @@
+{
+  "class_names": [
+    "Early Blight",
+    "Healthy",
+    "Late Blight"
+  ],
+  "image_size": [
+    224,
+    224
+  ],
+  "confidence_threshold": 0.7,
+  "test_images": 323,
+  "test_accuracy": 0.9814241528511047,
+  "test_loss": 0.04391153156757355,
+  "recall_by_class": {
+    "Early Blight": 0.9866666666666667,
+    "Healthy": 1.0,
+    "Late Blight": 0.9733333333333334
+  },
+  "seed": 123
+}

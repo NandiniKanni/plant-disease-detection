@@ -144,12 +144,14 @@ body {
 
         body {
             min-height: 100vh;
+            padding: 24px 0;
             background: url("https://images.unsplash.com/photo-1563514227147-6d2ff665a6a0?q=80&w=1920&auto=format&fit=crop") no-repeat center center/cover;
             display: flex;
             justify-content: center;
             align-items: center;
             font-family: 'DM Sans', sans-serif;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
         }
 
         /* Dark overlay with animated gradient */
@@ -453,6 +455,14 @@ body {
             text-transform: uppercase;
         }
 
+        .scope-note {
+            max-width: 290px;
+            margin: 10px auto 0;
+            color: rgba(245,240,232,0.65);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
         /* Result card */
         #resultBox {
             display: none;
@@ -477,6 +487,13 @@ body {
             margin-bottom: 8px;
         }
 
+        .result-message {
+            margin-top: 12px;
+            color: rgba(245,240,232,0.7);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
         .result-disease {
             font-family: 'Playfair Display', serif;
             font-size: 22px;
@@ -492,19 +509,27 @@ body {
         .confidence-label {
             display: flex;
             justify-content: space-between;
-            font-size: 11px;
-            color: rgba(245,240,232,0.4);
-            margin-bottom: 6px;
+            align-items: center;
+            font-size: 14px;
+            color: var(--cream);
+            margin: 12px 0 8px;
+        }
+
+        #confidenceVal {
+            color: var(--green-neon);
+            font-size: 18px;
+            font-weight: 700;
         }
 
         .confidence-track {
-            height: 6px;
+            height: 10px;
             background: rgba(255,255,255,0.08);
             border-radius: 10px;
             overflow: hidden;
         }
 
         .confidence-fill {
+            display: block;
             height: 100%;
             border-radius: 10px;
             background: linear-gradient(90deg, #1a8a45, var(--green-neon));
@@ -538,6 +563,12 @@ body {
             color: var(--green-bright);
             opacity: 0.5;
         }
+
+        @media (max-height: 760px) {
+            body {
+                align-items: flex-start;
+            }
+        }
     </style>
 </head>
 
@@ -551,18 +582,19 @@ body {
         <div class="header">
             <span class="logo">🌿</span>
             <h1>Plant <span>Disease</span><br>Detection</h1>
-            <p class="subtitle">AI-Powered Analysis</p>
+            <p class="subtitle">Potato leaf screening · 3 classes</p>
+            <p class="scope-note">Early blight, late blight, or healthy. Other plants and image types are not supported.</p>
         </div>
 
         <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
             <span class="upload-icon">📷</span>
             <p class="upload-text"><strong>Click to upload</strong> or drag & drop</p>
-            <p class="upload-text" style="margin-top:4px; font-size:11px;">JPG, PNG supported</p>
+            <p class="upload-text" style="margin-top:4px; font-size:11px;">JPG, PNG, BMP, WebP · 10 MB max</p>
             <img id="preview" alt="preview">
             <p id="fileName"></p>
         </div>
 
-        <input type="file" id="fileInput" accept="image/*">
+        <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.bmp,.webp">
 
         <button class="btn" onclick="predict()" id="predictBtn">
             ANALYSE PLANT
@@ -585,6 +617,7 @@ body {
             <div class="confidence-track">
                 <div class="confidence-fill" id="confidenceFill"></div>
             </div>
+            <p class="result-message" id="resultMessage"></p>
         </div>
 
         <div class="divider"></div>
@@ -649,71 +682,53 @@ body {
             const btn = document.getElementById('predictBtn');
             const loader = document.getElementById('loader');
             const resultBox = document.getElementById('resultBox');
+            const diseaseEl = document.getElementById('resultDisease');
+            const messageEl = document.getElementById('resultMessage');
+            const confidenceFill = document.getElementById('confidenceFill');
 
             btn.style.display = 'none';
             loader.style.display = 'block';
             resultBox.style.display = 'none';
+            confidenceFill.style.width = '0%';
+            confidenceFill.classList.remove('low');
 
             try {
-                let formData = new FormData();
+                const formData = new FormData();
                 formData.append("file", file);
 
-                // let response = await fetch("http://127.0.0.1:8000/predict", {
-                //     method: "POST",
-                //     body: formData
-                // });
-                let response = await fetch("/predict", {
-                method: "POST",
-                body: formData
+                const response = await fetch("/predict", {
+                    method: "POST",
+                    body: formData
                 });
+                const data = await response.json();
                 if (!response.ok) {
-    throw new Error("Prediction request failed: " + response.status);
-}
-
-                let data = await response.json();
-
+                    throw new Error(data.detail || "The image could not be analysed.");
+                }
                 const disease = data.predicted_class;
                 const confidence = Math.round(data.confidence * 100);
-
-                const diseaseEl = document.getElementById('resultDisease');
-                // 🔥 Handle unknown/random image
-if (disease === 'Unknown') {
-    diseaseEl.textContent = '⚠️ Not a Potato Leaf';
-    diseaseEl.className = 'result-disease disease';
-    document.getElementById('confidenceVal').textContent = confidence + '%';
-    loader.style.display = 'none';
-    resultBox.style.display = 'block';
-    setTimeout(() => {
-        const fill = document.getElementById('confidenceFill');
-        fill.style.width = confidence + '%';
-        fill.classList.add('low');
-    }, 100);
-    btn.style.display = 'block';
-    return;
-}
+                document.getElementById('confidenceVal').textContent = confidence + '%';
+                messageEl.textContent = data.message;
+                if (disease === 'Unknown') {
+                    diseaseEl.textContent = 'Low-confidence result';
+                    diseaseEl.className = 'result-disease disease';
+                    confidenceFill.classList.add('low');
+                } else {
                 diseaseEl.textContent = disease;
                 diseaseEl.className = 'result-disease ' + (disease === 'Healthy' ? 'healthy' : 'disease');
-
-                document.getElementById('confidenceVal').textContent = confidence + '%';
-
-                loader.style.display = 'none';
-                resultBox.style.display = 'block';
-
-                setTimeout(() => {
-                    const fill = document.getElementById('confidenceFill');
-                    fill.style.width = confidence + '%';
-                    if (confidence < 60) fill.classList.add('low');
-                }, 100);
-
+                }
+                confidenceFill.style.width = confidence + '%';
+                if (confidence < 60) confidenceFill.classList.add('low');
             } catch (err) {
-                loader.style.display = 'none';
-                const diseaseEl = document.getElementById('resultDisease');
-                diseaseEl.textContent = 'Connection error';
+                diseaseEl.textContent = 'Could not analyse image';
                 diseaseEl.className = 'result-disease disease';
+                messageEl.textContent = err.message;
+                document.getElementById('confidenceVal').textContent = '—';
+                confidenceFill.style.width = '0%';
+            } finally {
+                loader.style.display = 'none';
                 resultBox.style.display = 'block';
+                btn.style.display = 'block';
             }
-
-            btn.style.display = 'block';
         }
     </script>
 

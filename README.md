@@ -1,139 +1,45 @@
-# 🌿 Plant Disease Detection System
-
-An end-to-end AI-powered web application that detects potato leaf diseases using a Convolutional Neural Network,
-served via a REST API and a modern animated frontend.
+# Plant Disease Detection
 
 ![Python](https://img.shields.io/badge/Python-3.12-blue)
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green)
 
+# Potato Leaf Disease Detector
 
----
+A local web app that classifies potato leaf photos as **Early Blight**, **Late Blight**, or **Healthy**. It uses a transfer-learned MobileNetV2 model, served by FastAPI.
 
-## 🎯 Problem Statement
-Farmers lose significant crop yield every year due to undetected plant diseases. Early detection can save up to 
-40% of crop loss. This system provides an accessible, AI-powered tool to detect potato leaf diseases instantly 
-from a photo.
+> This is not a general plant-disease detector. It has only been trained on potato leaves, and its confidence score is not a reliable detector for unsupported plants or non-leaf images. Use predictions as a screening aid, not as a substitute for expert diagnosis.
 
----
+## Dataset and training
 
-## 🏗️ Architecture
-```
-Image Upload (Frontend)
-        ↓
-FastAPI REST API
-        ↓
-Image Preprocessing (PIL, NumPy)
-        ↓
-CNN Model (TensorFlow/Keras)
-        ↓
-Prediction + Confidence Score
-        ↓
-Result Display (Frontend)
-```
+The included dataset is expected at `potato!/potato!/` with one folder per class. The current data contains 1,000 early-blight images, 1,000 late-blight images, and 152 healthy images. Training uses deterministic, class-stratified train/validation/test splits, class weights for the smaller healthy class, image augmentation, and ImageNet-pretrained MobileNetV2 weights.
 
----
+From the repository root, create and activate a virtual environment, then install dependencies:
 
-## ✨ Features
-
-- 🔍 Detects 3 conditions: **Early Blight**, **Late Blight**, **Healthy**
-- 📊 Real-time **confidence scoring** with animated progress bar
-- 🖼️ **Drag & drop** image upload with live preview
-- ⚠️ **Unknown image rejection** — rejects non-leaf images below confidence threshold
-- 🌐 **REST API** built with FastAPI
-- 💊 **Disease descriptions** with cause and symptoms
-- 🎨 Modern animated UI with glassmorphism design
-
----
-
-## 🛠️ Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| ML Model | TensorFlow, Keras, NumPy |
-| Backend | FastAPI, Python, Uvicorn |
-| Frontend | HTML5, CSS3, JavaScript |
-| Image Processing | PIL, NumPy |
-| Deployment | Google Cloud Run (WIP) |
-
----
-
-## 📁 Project Structure
-```
-plant-disease-detection/
-├── api/
-│   ├── main.py          # FastAPI app + prediction endpoint
-│   └── requirements.txt
-├── frontend/
-│   ├── index.html       # Animated frontend UI
-│   └── FARM.jpg         # Background image
-├── training/
-│   └── training.ipynb   # Model training notebook
-└── README.md
-```
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Python 3.10+
-- TensorFlow 2.x
-- FastAPI
-
-### Installation
-```bash
-# Clone the repo
-git clone https://github.com/YOURUSERNAME/plant-disease-detection.git
-cd plant-disease-detection
-
-# Create virtual environment
+```powershell
 python -m venv .venv
-.venv\Scripts\activate  # Windows
-
-# Install dependencies
-pip install -r api/requirements.txt
-
-# Run the server
-cd api
-uvicorn main:app --reload --port 8000
+.\.venv\Scripts\Activate.ps1
+pip install -r api\requirements.txt
 ```
 
-### Usage
-1. Open `http://127.0.0.1:8000` in your browser
-2. Upload a potato leaf image
-3. Click **Analyse Plant**
-4. View disease prediction with confidence score
+Train the model (the first run downloads the public MobileNetV2 ImageNet weights):
 
----
+```powershell
+python pot.py
+```
 
-## 📊 Model Details
+This saves `potato_disease_model.h5` and `potato_disease_model.json` in the repository root. The training script prints held-out test accuracy and per-class recall. Keep these metrics with any model you deploy; accuracy varies with the dataset and training run.
 
-- **Architecture:** Convolutional Neural Network (CNN)
-- **Input Size:** 256x256 RGB images
-- **Classes:** Early Blight, Late Blight, Healthy
-- **Dataset:** PlantVillage Dataset
+## Run the app
 
-- **Data Augmentation:** ImageDataGenerator (rotation, flip, zoom, shift)[yet to be done]
+After training, start the API from the repository root:
 
----
+```powershell
+python -m uvicorn api.main:app --reload --port 8000
+```
 
-## ⚠️ Current Limitations
+Open <http://127.0.0.1:8000>, upload a potato leaf photo, and select **Analyse Plant**. JPG, PNG, BMP, and WebP images up to 10 MB are accepted. The API is also available at `POST /predict` with a multipart `file` field. Low-confidence predictions are returned as `Unknown`; this does not guarantee that a confident prediction is a potato leaf.
 
-- Trained only on potato leaves — other plants not supported
-- Requires clear, close-up leaf images for accurate results
-- Low confidence predictions (< 90%) are rejected as unknown
-- No mobile app support yet
-
----
-
-## 🔮 Future Improvements
-- [ ]- **Data Augmentation:** ImageDataGenerator (rotation, flip, zoom, shift)
-- [ ] Multi-crop support (Tomato, Corn, Wheat)
-- [ ] Multilingual farmer chatbot with voice input/output
-- [ ] React Native mobile app with live camera capture
-- [ ] Retrain with "Unknown" class for better rejection
-- [ ] Google Cloud Run deployment
-- [ ] User authentication and prediction history
+The API resolves the model and frontend paths from the repository location, so it can also be started from the `api` directory with `uvicorn main:app --reload --port 8000`.
 
 ---
