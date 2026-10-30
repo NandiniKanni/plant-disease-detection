@@ -182,7 +182,7 @@ def make_dataset(samples, training=False):
 
 
 # ==========================================
-# 4. BUILD YOUR SIR'S CNN
+# 4. BUILD YOUR  CNN
 # ==========================================
 
 def build_model(number_of_classes):
